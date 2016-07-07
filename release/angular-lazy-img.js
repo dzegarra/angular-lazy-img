@@ -176,7 +176,7 @@ angular.module('angularLazyImg').factory('lazyImgHelpers', [
     function isElementInView(elem, offset, winDimensions) {
       var rect = elem.getBoundingClientRect();
       var bottomline = winDimensions.height + offset;
-      return (
+      return rect.right && rect.bottom && (
        rect.left >= 0 && rect.right <= winDimensions.width + offset && (
          rect.top >= 0 && rect.top <= bottomline ||
          rect.bottom <= bottomline && rect.bottom >= 0 - offset
@@ -212,16 +212,17 @@ angular.module('angularLazyImg').factory('lazyImgHelpers', [
 
   }
 ]);
+
 angular.module('angularLazyImg')
   .directive('lazyImg', [
     '$rootScope', 'LazyImgMagic', function ($rootScope, LazyImgMagic) {
       'use strict';
 
       function link(scope, element, attributes) {
-        var lazyImage = new LazyImgMagic(element);
-        attributes.$observe('lazyImg', function (newSource) {
+        var lazyImage = new LazyImgMagic(element),
+            deregister = attributes.$observe('lazyImg', function (newSource) {
           if (newSource) {
-            // in angular 1.3 it might be nice to remove observer here
+            deregister();
             lazyImage.setSource(newSource);
           }
         });
